@@ -1,0 +1,84 @@
+### Переменные (вставьте токены после логина)
+@host = http://localhost:8080
+@userToken = REPLACE_WITH_USER_TOKEN
+@adminToken = REPLACE_WITH_ADMIN_TOKEN
+
+### Регистрация нового пользователя (USER)
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "test",
+  "password": "test"
+}
+
+### Авторизация (получение токена USER)
+# Скопируйте token из ответа и вставьте в @userToken наверху файла
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "test",
+  "password": "test"
+}
+
+### Авторизация (получение токена ADMIN)
+# Скопируйте token из ответа и вставьте в @adminToken наверху файла
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+### Получить список отелей (доступ: USER, ADMIN)
+GET {{host}}/api/hotels
+Authorization: Bearer {{userToken}}
+
+### Получить рекомендованные номера (доступ: USER, ADMIN)
+GET {{host}}/api/rooms/recommend
+Authorization: Bearer {{userToken}}
+
+### Создать отель (доступ: только ADMIN)
+POST {{host}}/api/hotels
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "New Test Hotel",
+  "address": "Address"
+}
+
+### Создать бронирование (автоподбор)
+POST {{host}}/api/bookings
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+Idempotency-Key: test-key-123
+
+{
+  "autoSelect": true,
+  "startDate": "2026-12-01",
+  "endDate": "2026-12-05"
+}
+
+### Создать бронирование (с ручным выбором комнаты)
+POST {{host}}/api/bookings
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+Idempotency-Key: test-key-456
+
+{
+  "roomId": 1,
+  "autoSelect": false,
+  "startDate": "2026-12-10",
+  "endDate": "2026-12-15"
+}
+
+### Получить историю бронирований
+GET {{host}}/api/bookings?page=0&size=10
+Authorization: Bearer {{userToken}}
+
+### Отменить бронирование
+DELETE {{host}}/api/bookings/1
+Authorization: Bearer {{userToken}}
